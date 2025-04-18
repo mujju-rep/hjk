@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>President Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f8fc;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 24px;
+      color: #333;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 15px;
+      margin: 20px 0;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 10px;
+    }
+
+    .tabs button {
+      background: none;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      color: #2a66ff;
+    }
+
+    .section {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      margin-top: 20px;
+      display: none;
+    }
+
+    .section input,
+    .section textarea,
+    .section select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .section button {
+      padding: 10px 20px;
+      background-color: #2a66ff;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .event-card, .student-card {
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 10px;
+      background-color: #fff;
+    }
+
+    .event-card a {
+      color: #2a66ff;
+      text-decoration: underline;
+    }
+  </style>
+  <script>
+    function showSection(sectionId) {
+      const sections = ['formSection', 'eventListSection', 'studentSection'];
+      sections.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+      document.getElementById(sectionId).style.display = 'block';
+    }
+
+    window.onload = function() {
+      showSection('formSection');
+    }
+  </script>
+</head>
+<body>
+  <h1>President Dashboard</h1>
+  <p>Manage your club activities and members</p>
+
+  <div class="tabs">
+    <button onclick="showSection('formSection')">🗓️ Plan Events</button>
+    <button onclick="showSection('studentSection')">👥 Students</button>
+    <button onclick="alert('Roles section coming soon!')">🧑‍💼 Roles</button>
+    <button onclick="alert('Auditorium booking coming soon!')">🏛️ Book Auditorium</button>
+  </div>
+
+  <!-- Event Form Section -->
+  <div id="formSection" class="section">
+    <h2>Request SAC Approval</h2>
+    <form>
+      <input type="text" placeholder="Event Name" required>
+      <textarea placeholder="Event Description" rows="4" required></textarea>
+      <select required>
+        <option value="">Select Event Type</option>
+        <option value="Workshop">Workshop</option>
+        <option value="Competition">Competition</option>
+        <option value="Talk">Talk</option>
+        <option value="Seminar">Seminar</option>
+        <option value="Other">Other</option>
+      </select>
+      <input type="text" placeholder="Venue/Location" required>
+      <input type="url" placeholder="Registration Form Link (Google Form)" required>
+      <input type="url" placeholder="Poster/Banner Image Link" required>
+      <input type="date" required>
+      <input type="text" placeholder="Expected Participants" required>
+      <input type="text" placeholder="Required Resources" required>
+      <button type="submit">Submit to SAC</button>
+    </form>
+  </div>
+
+  <!-- Upcoming Events Section -->
+  <div id="eventListSection" class="section">
+    <h2>Upcoming Events</h2>
+    <button style="margin-bottom: 10px; background-color: #2a66ff; color: white; padding: 8px 12px; border: none; border-radius: 6px;">+ Create New Event</button>
+    <div class="event-card">
+      <strong>Annual Photography Exhibition</strong><br>
+      Date: March 15, 2025<br>
+      Location: Main Hall<br>
+      <a href="#">Registration Link</a>
+    </div>
+  </div>
+
+  <!-- Student Management Section -->
+  <div id="studentSection" class="section">
+    <h2>Student Management</h2>
+    <p>Filter and manage club members</p>
+    <select>
+      <option>Filter by Year</option>
+      <option>1st Year</option>
+      <option>2nd Year</option>
+      <option>3rd Year</option>
+      <option>4th Year</option>
+    </select>
+    <button style="margin-left: 10px; padding: 8px 12px; border: none; background-color: #2a66ff; color: white; border-radius: 6px;">Export</button>
+
+    <div class="student-card">
+      <strong>John Doe</strong><br>
+      Year: 2nd Year<br>
+      Class: CSE-A<br>
+      Section: A<br>
+      Role: Member
+    </div>
+
+    <div class="student-card">
+      <strong>Jane Smith</strong><br>
+      Year: 3rd Year<br>
+      Class: CSE-B<br>
+      Section: B<br>
+      Role: Designer
+    </div>
+  </div>
+</body>
+</html>

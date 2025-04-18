@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Response Analyzer</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
+    h2 { color: #333; }
+    label { display: block; margin-top: 10px; }
+    select, input[type='file'], input[type='number'], button {
+      margin-top: 5px;
+      padding: 8px;
+      width: 100%;
+    }
+    #result-table { margin-top: 20px; border-collapse: collapse; width: 100%; }
+    #result-table th, #result-table td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    #result-table th { background-color: #eee; }
+  </style>
+</head>
+<body>
+  <h2>🔍 AI Response Analyzer</h2>
+
+  <label for="fileUpload">Upload CSV/XLSX File:</label>
+  <input type="file" id="fileUpload" accept=".csv,.xlsx,.xls" />
+
+  <label for="answerColumn">Select Answer Column:</label>
+  <select id="answerColumn"></select>
+
+  <label for="filterColumn">Select Filter Column:</label>
+  <select id="filterColumn"></select>
+
+  <label for="filterValue">Select Filter Value:</label>
+  <select id="filterValue"></select>
+
+  <label for="topK">Top N Candidates:</label>
+  <input type="number" id="topK" min="1" max="20" value="5" />
+
+  <button onclick="analyzeResponses()">Analyze</button>
+  <button onclick="exportCSV()">Export Results</button>
+
+  <h3 id="statusText"></h3>
+  <table id="result-table"></table>
+
+  <script>
+    const backendURL = 'http://127.0.0.1:5000';
+
+    document.getElementById('fileUpload').addEventListener('change', async function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      document.getElementById('statusText').innerText = 'Reading file...';
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch(`${backendURL}/upload`, {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      const columns = data.columns;
+
+      fillDropdown('answerColumn', columns);
+      fillDropdown('filterColumn', columns);
+      document.getElementById('statusText').innerText = 'File loaded. Select attributes.';
+    });
+
+    document.getElementById('filterColumn').addEventListener('change', async function (e) {
+      const col = e.target.value;
+      const res = await fetch(`${backendURL}/filter-values`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ column: col })
+      });
+      const data = await res.json();
+      fillDropdown('filterValue', data.values);
+    });
+
+    async function analyzeResponses() {
+      const answerCol = document.getElementById('answerColumn').value;
+      const filterCol = document.getElementById('filterColumn').value;
+      const filterVal = document.getElementById('filterValue').value;
+      const topK = document.getElementById('topK').value;
+
+      const res = await fetch(`${backendURL}/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answer_col: answerCol, filter_col: filterCol, filter_val: filterVal, top_k: topK })
+      });
+
+      const data = await res.json();
+      renderTable(data);
+      document.getElementById('statusText').innerText = `Top ${topK} candidates shown below.`;
+    }
+
+    function renderTable(data) {
+      const table = document.getElementById('result-table');
+      table.innerHTML = '';
+      if (!data.length) return;
+      const headers = Object.keys(data[0]);
+      const thead = document.createElement('tr');
+      headers.forEach(h => {
+        const th = document.createElement('th');
+        th.innerText = h;
+        thead.appendChild(th);
+      });
+      table.appendChild(thead);
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        headers.forEach(h => {
+          const td = document.createElement('td');
+          td.innerText = row[h];
+          tr.appendChild(td);
+        });
+        table.appendChild(tr);
+      });
+    }
+
+    async function exportCSV() {
+      window.open(`${backendURL}/export`, '_blank');
+    }
+
+    function fillDropdown(id, values) {
+      const dropdown = document.getElementById(id);
+      dropdown.innerHTML = '';
+      values.forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v;
+        opt.text = v;
+        dropdown.appendChild(opt);
+      });
+    }
+  </script>
+</body>
+</html>
